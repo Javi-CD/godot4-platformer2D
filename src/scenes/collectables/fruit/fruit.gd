@@ -9,7 +9,8 @@ signal collected(fruit_type: StringName)
 enum FruitType {
 	APPLE,
 	BANANA,
-	KIWI
+	KIWI,
+	PINEAPPLE
 }
 
 
@@ -50,6 +51,8 @@ func _update_fruit_visual() -> void:
 			fruit_sprite.play("banana")
 		FruitType.KIWI:
 			fruit_sprite.play("kiwi")
+		FruitType.PINEAPPLE:
+			fruit_sprite.play("pineapple")
 
 
 func _on_body_entered(body: Node) -> void:
@@ -97,5 +100,7 @@ func _get_fruit_name() -> StringName:
 			return &"banana"
 		FruitType.KIWI:
 			return &"kiwi"
+		FruitType.PINEAPPLE:
+			return &"pineapple"
 
 	return &"unknown"
