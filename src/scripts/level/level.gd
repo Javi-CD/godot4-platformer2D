@@ -125,6 +125,8 @@ func _on_flag_entered() -> void:
 	_is_completed = true
 	_is_waiting_for_player_exit = true
 
+	SoundManager.play_sfx("level_complete")
+
 	if player.has_method("start_level_exit"):
 		player.start_level_exit()
 

@@ -80,6 +80,7 @@ func _collect() -> void:
 	collect_effect_sprite.play("collected")
 
 	emit_signal("collected", _get_fruit_name())
+	SoundManager.play_sfx("fruit_collect", 0.08)
 
 
 func reset_fruit() -> void:
