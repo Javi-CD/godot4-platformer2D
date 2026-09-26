@@ -39,7 +39,7 @@ func load_level(level_path: String, animate: bool = true) -> void:
 		return
 
 	var scene_mgr = get_node_or_null("/root/SceneManager")
-	if animate and scene_mgr != null and scene_mgr.has_method("play_transition") and _current_level != null:
+	if animate and scene_mgr != null and scene_mgr.has_method("play_transition"):
 		await scene_mgr.play_transition(func(): _load_level_internal(level_path))
 	else:
 		_load_level_internal(level_path)

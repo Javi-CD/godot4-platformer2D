@@ -16,8 +16,8 @@ func play_transition(on_middle_action: Callable = Callable()) -> void:
 	if on_middle_action.is_valid():
 		on_middle_action.call()
 
-	if animation != null and animation.has_animation("transition_out"):
-		animation.play_backwards("transition_out")
+	if animation != null and animation.has_animation("transition_in"):
+		animation.play("transition_in")
 		await animation.animation_finished
 
 
