@@ -12,12 +12,9 @@ enum PlatformState {
 @export_range(0.1, 3.0, 0.05) var trigger_delay := 0.6
 @export_range(0.5, 10.0, 0.5) var reset_time := 3.0
 
-@export_group("Animation & Slowdown")
-@export_range(0.05, 1.0, 0.05) var min_animation_speed_scale := 0.15
-
 @export_group("Vibration & Weight Dip")
-@export_range(0.5, 5.0, 0.1) var shake_intensity := 1.8
-@export_range(1.0, 10.0, 0.5) var dip_distance := 3.0
+@export_range(0.0, 5.0, 0.1) var shake_intensity := 1.8
+@export_range(0.0, 10.0, 0.5) var dip_distance := 3.0
 @export_range(5.0, 40.0, 1.0) var dip_speed := 20.0
 
 @export_group("Physics & Movement")
@@ -53,24 +50,20 @@ func _physics_process(delta: float) -> void:
 
 
 func _process_dip_and_vibration(delta: float) -> void:
-	# Smoothly interpolate the vertical dip offset
+	# Smoothly interpolate vertical dip offset
 	_current_dip_y = move_toward(_current_dip_y, _target_dip_y, dip_speed * delta)
 	global_position.y = _initial_position.y + _current_dip_y
 
 	if _state == PlatformState.TRIGGERED:
 		_trigger_timer = max(_trigger_timer - delta, 0.0)
 
-		# Progress from 1.0 (just stepped on) to 0.0 (about to fall)
-		var progress: float = _trigger_timer / trigger_delay if trigger_delay > 0.0 else 0.0
-
-		# Reduces the animation speed progressively
-		animated_sprite.speed_scale = lerp(min_animation_speed_scale, 1.0, progress)
-
-		# Applies vibration offset to sprite
-		var current_shake: float = lerp(shake_intensity, 0.5, progress)
-		var offset_x := randf_range(-current_shake, current_shake)
-		var offset_y := randf_range(-current_shake, current_shake)
-		animated_sprite.offset = Vector2(offset_x, offset_y)
+		# Apply vibration offset to sprite if intensity is above 0
+		if shake_intensity > 0.0:
+			var offset_x := randf_range(-shake_intensity, shake_intensity)
+			var offset_y := randf_range(-shake_intensity, shake_intensity)
+			animated_sprite.offset = Vector2(offset_x, offset_y)
+		else:
+			animated_sprite.offset = Vector2.ZERO
 
 		if _trigger_timer <= 0.0:
 			_start_falling()
