@@ -35,7 +35,7 @@ func _ready() -> void:
 		_current_index = _get_next_point_index()
 
 
-func _process(delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	if _points.size() < 2:
 		return
 
