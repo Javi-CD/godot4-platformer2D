@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://cm0strl1a3b08" path="res://src/scenes/collectables/fruit/fruit.tscn" id="4_27jab"]
 [ext_resource type="PackedScene" uid="uid://codhkxwxd41kh" path="res://src/scenes/kill_zone/kill_zone.tscn" id="5_qu1h2"]
 [ext_resource type="PackedScene" uid="uid://duvbwwpm7oqix" path="res://src/scenes/traps/spikes/spikes.tscn" id="6_27jab"]
+[ext_resource type="PackedScene" uid="uid://cjewfc1sea1ke" path="res://src/scenes/traps/falling_platform/falling_platform.tscn" id="7_qu1h2"]
 [ext_resource type="PackedScene" uid="uid://cjgqiaw8sipod" path="res://src/scenes/exit_flag/exit_flag.tscn" id="7_x8rf8"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_27jab"]
@@ -112,6 +113,11 @@ fruit_type = 2
 [node name="Spikes" parent="Traps" unique_id=1081960643 instance=ExtResource("6_27jab")]
 position = Vector2(384, 264)
 variant = 1
+
+[node name="FallingPlatform" parent="Traps" unique_id=808692909 instance=ExtResource("7_qu1h2")]
+position = Vector2(192, 192)
+shake_intensity = 0.5
+fall_speed = 250.0
 
 [node name="KillZone" parent="." unique_id=1698052293 instance=ExtResource("5_qu1h2")]
 position = Vector2(1, 16)
