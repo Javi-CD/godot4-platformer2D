@@ -6,10 +6,10 @@ extends Node
 
 
 @onready var level_container: Node = $LevelContainer
-@onready var hud: HUD = $HUD
+@onready var hud: CanvasLayer = $HUD
 
 
-var _current_level: Level = null
+var _current_level: Node2D = null
 
 
 func _ready() -> void:
@@ -30,14 +30,16 @@ func load_level(level_path: String) -> void:
 		push_warning("No se pudo cargar la escena: " + level_path)
 		return
 
-	var instantiated := level_scene.instantiate()
-	if not instantiated is Level:
-		push_warning("La escena cargada no es de tipo Level: " + level_path)
+	var instantiated := level_scene.instantiate() as Node2D
+	if instantiated == null:
+		push_warning("La escena cargada no se pudo instanciar correctamente: " + level_path)
 		return
 
-	_current_level = instantiated as Level
+	_current_level = instantiated
 	level_container.add_child(_current_level)
-	_current_level.level_completed.connect(_on_level_completed)
+
+	if _current_level.has_signal("level_completed"):
+		_current_level.level_completed.connect(_on_level_completed)
 
 	_assign_level_player_to_hud()
 	_start_player_level_spawn()
@@ -45,19 +47,31 @@ func load_level(level_path: String) -> void:
 
 func _assign_level_player_to_hud() -> void:
 	if _current_level == null:
-		hud.set_player(null)
+		if hud.has_method("set_player"):
+			hud.set_player(null)
 		return
 
-	var player := _current_level.get_player()
-	hud.set_player(player)
+	var player: Node = null
+	if _current_level.has_method("get_player"):
+		player = _current_level.get_player()
+	else:
+		player = _current_level.get_node_or_null("Player")
+
+	if hud.has_method("set_player"):
+		hud.set_player(player)
 
 
 func _start_player_level_spawn() -> void:
 	if _current_level == null:
 		return
 
-	var player := _current_level.get_player()
-	if player != null:
+	var player: Node = null
+	if _current_level.has_method("get_player"):
+		player = _current_level.get_player()
+	else:
+		player = _current_level.get_node_or_null("Player")
+
+	if player != null and player.has_method("start_level_spawn"):
 		player.start_level_spawn()
 
 

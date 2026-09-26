@@ -102,31 +102,31 @@ func _setup_state_machine() -> void:
 	state_machine.name = "StateMachine"
 	add_child(state_machine)
 
-	var idle_state := PlayerStateIdle.new()
+	var idle_state: State = PlayerStateIdle.new()
 	idle_state.name = "Idle"
 	state_machine.add_child(idle_state)
 
-	var run_state := PlayerStateRun.new()
+	var run_state: State = PlayerStateRun.new()
 	run_state.name = "Run"
 	state_machine.add_child(run_state)
 
-	var jump_state := PlayerStateJump.new()
+	var jump_state: State = PlayerStateJump.new()
 	jump_state.name = "Jump"
 	state_machine.add_child(jump_state)
 
-	var fall_state := PlayerStateFall.new()
+	var fall_state: State = PlayerStateFall.new()
 	fall_state.name = "Fall"
 	state_machine.add_child(fall_state)
 
-	var wall_slide_state := PlayerStateWallSlide.new()
+	var wall_slide_state: State = PlayerStateWallSlide.new()
 	wall_slide_state.name = "WallSlide"
 	state_machine.add_child(wall_slide_state)
 
-	var hurt_state := PlayerStateHurt.new()
+	var hurt_state: State = PlayerStateHurt.new()
 	hurt_state.name = "Hurt"
 	state_machine.add_child(hurt_state)
 
-	var respawn_state := PlayerStateRespawn.new()
+	var respawn_state: State = PlayerStateRespawn.new()
 	respawn_state.name = "Respawn"
 	state_machine.add_child(respawn_state)
 
@@ -315,7 +315,7 @@ func _update_invulnerability_feedback() -> void:
 
 	var time := Time.get_ticks_msec() / 1000.0
 	var pulse := (sin(time * INVULNERABILITY_FLASH_SPEED) + 1.0) * 0.5
-	var alpha = lerp(INVULNERABILITY_MIN_ALPHA, 1.0, pulse)
+	var alpha: float = lerp(INVULNERABILITY_MIN_ALPHA, 1.0, pulse)
 
 	sprite.modulate.a = alpha
 
@@ -434,7 +434,7 @@ func _finish_level_spawn() -> void:
 
 
 func enter_hurt_state(source_position: Vector2) -> void:
-	var hit_direction := sign(global_position.x - source_position.x)
+	var hit_direction: float = sign(global_position.x - source_position.x)
 	if hit_direction == 0.0:
 		hit_direction = 1.0
 
@@ -497,10 +497,10 @@ func _update_run_dust() -> void:
 	if dust_effect == null:
 		return
 
-	var is_in_active_movement_state := state_machine.current_state != null and (
+	var is_in_active_movement_state: bool = state_machine != null and state_machine.current_state != null and (
 		state_machine.current_state.name == "Run"
 	)
-	var is_moving_on_floor := is_on_floor() and abs(velocity.x) > 10.0 and is_in_active_movement_state
+	var is_moving_on_floor: bool = is_on_floor() and abs(velocity.x) > 10.0 and is_in_active_movement_state
 
 	if not is_moving_on_floor:
 		if dust_effect.emitting:
@@ -521,12 +521,12 @@ func _update_wall_slide_dust() -> void:
 	if wall_dust_effect == null:
 		return
 
-	if state_machine.current_state == null or state_machine.current_state.name != "WallSlide":
+	if state_machine == null or state_machine.current_state == null or state_machine.current_state.name != "WallSlide":
 		if wall_dust_effect.emitting:
 			wall_dust_effect.emitting = false
 		return
 
-	var wall_direction := _get_wall_direction()
+	var wall_direction: float = _get_wall_direction()
 
 	if wall_direction < 0.0:
 		wall_dust_effect.global_position = dust_spawn_wall_left.global_position

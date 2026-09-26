@@ -11,13 +11,14 @@ var current_state: State = null
 var states: Dictionary = {}
 
 
-func init(player: Player) -> void:
+func init(target_player: CharacterBody2D) -> void:
 	for child in get_children():
 		if child is State:
 			states[child.name.to_lower()] = child
-			child.player = player
+			child.player = target_player
 			child.state_machine = self
-			child.transitioned.connect(_on_child_transitioned)
+			if not child.transitioned.is_connected(_on_child_transitioned):
+				child.transitioned.connect(_on_child_transitioned)
 
 	if initial_state != null:
 		current_state = initial_state
@@ -45,15 +46,15 @@ func transition_to(target_state_name: StringName, msg: Dictionary = {}) -> void:
 		push_warning("StateMachine: Attempted to transition to non-existent state '%s'" % target_state_name)
 		return
 
-	var previous_state_name := current_state.name if current_state != null else &""
+	var previous_state_name: StringName = StringName(current_state.name) if current_state != null else &""
 
 	if current_state != null:
 		current_state.exit()
 
-	current_state = states[key]
+	current_state = states[key] as State
 	current_state.enter(msg)
 
-	emit_signal("state_changed", previous_state_name, current_state.name)
+	emit_signal("state_changed", previous_state_name, StringName(current_state.name))
 
 
 func _on_child_transitioned(state: State, new_state_name: StringName, msg: Dictionary) -> void:

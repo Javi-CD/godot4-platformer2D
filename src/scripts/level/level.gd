@@ -8,15 +8,15 @@ signal level_completed(next_level_path: String)
 @export_file("*.tscn") var next_level_path: String
 
 
-@onready var player: Player = $Player
-@onready var exit_flag: ExitFlag = $ExitFlag
+@onready var player: Node2D = $Player
+@onready var exit_flag: Area2D = $ExitFlag
 @onready var collectables_container: Node = $Collectables
 
 
 var _total_fruits := 0
 var _collected_fruits := 0
 var _is_completed := false
-var _fruits: Array[Fruit] = []
+var _fruits: Array[Area2D] = []
 var _is_waiting_for_player_exit := false
 
 
@@ -24,19 +24,21 @@ func _ready() -> void:
 	_setup_fruits()
 	_update_exit_state()
 
-	if exit_flag != null:
+	if exit_flag != null and exit_flag.has_signal("player_entered"):
 		exit_flag.player_entered.connect(_on_flag_entered)
 	else:
 		push_warning("ExitFlag no encontrado en la escena del nivel")
 
 	if player != null:
-		player.respawned.connect(_on_player_respawned)
-		player.level_exit_finished.connect(_on_player_level_exit_finished)
+		if player.has_signal("respawned"):
+			player.respawned.connect(_on_player_respawned)
+		if player.has_signal("level_exit_finished"):
+			player.level_exit_finished.connect(_on_player_level_exit_finished)
 	else:
 		push_warning("Player no encontrado en la escena del nivel")
 
 
-func get_player() -> Player:
+func get_player() -> Node2D:
 	return player
 
 
@@ -49,18 +51,19 @@ func _setup_fruits() -> void:
 
 	for fruit in _fruits:
 		_total_fruits += 1
-		fruit.collected.connect(_on_fruit_collected)
+		if fruit.has_signal("collected"):
+			fruit.collected.connect(_on_fruit_collected)
 
 
-func _find_fruits(root: Node) -> Array[Fruit]:
-	var fruits: Array[Fruit] = []
+func _find_fruits(root: Node) -> Array[Area2D]:
+	var fruits: Array[Area2D] = []
 
 	if root == null:
 		return fruits
 
 	for child in root.get_children():
-		if child is Fruit:
-			fruits.append(child as Fruit)
+		if child.has_signal("collected"):
+			fruits.append(child as Area2D)
 
 		fruits.append_array(_find_fruits(child))
 

@@ -5,11 +5,11 @@ extends CanvasLayer
 @onready var heart_display: AnimatedSprite2D = $HeartDisplay
 
 
-var _player: Player = null
+var _player: Node = null
 
 
-func set_player(player: Player) -> void:
-	if _player != null and _player.health_changed.is_connected(_on_player_health_changed):
+func set_player(player: Node) -> void:
+	if _player != null and _player.has_signal("health_changed") and _player.health_changed.is_connected(_on_player_health_changed):
 		_player.health_changed.disconnect(_on_player_health_changed)
 
 	_player = player
@@ -19,8 +19,11 @@ func set_player(player: Player) -> void:
 		return
 
 	heart_display.visible = true
-	_player.health_changed.connect(_on_player_health_changed)
-	_on_player_health_changed(_player.get_current_health(), _player.get_max_health())
+
+	if _player.has_signal("health_changed"):
+		_player.health_changed.connect(_on_player_health_changed)
+		if _player.has_method("get_current_health") and _player.has_method("get_max_health"):
+			_on_player_health_changed(_player.get_current_health(), _player.get_max_health())
 
 
 func _on_player_health_changed(current_health: int, max_health: int) -> void:
