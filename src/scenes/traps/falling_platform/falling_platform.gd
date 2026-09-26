@@ -15,8 +15,12 @@ enum PlatformState {
 @export_group("Animation & Slowdown")
 @export_range(0.05, 1.0, 0.05) var min_animation_speed_scale := 0.15
 
-@export_group("Vibration & Movement")
+@export_group("Vibration & Weight Dip")
 @export_range(0.5, 5.0, 0.1) var shake_intensity := 1.8
+@export_range(1.0, 10.0, 0.5) var dip_distance := 3.0
+@export_range(5.0, 40.0, 1.0) var dip_speed := 20.0
+
+@export_group("Physics & Movement")
 @export var fall_speed := 300.0
 
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
@@ -28,39 +32,48 @@ var _initial_position := Vector2.ZERO
 var _trigger_timer := 0.0
 var _reset_timer := 0.0
 
+var _target_dip_y := 0.0
+var _current_dip_y := 0.0
+
 
 func _ready() -> void:
 	_initial_position = global_position
 	player_detector_area.body_entered.connect(_on_player_entered)
+	player_detector_area.body_exited.connect(_on_player_exited)
 	_reset_to_idle()
 
 
 func _physics_process(delta: float) -> void:
 	match _state:
-		PlatformState.TRIGGERED:
-			_process_vibration_and_slowdown(delta)
+		PlatformState.IDLE, PlatformState.TRIGGERED:
+			_process_dip_and_vibration(delta)
 
 		PlatformState.FALLING:
 			_process_fall(delta)
 
 
-func _process_vibration_and_slowdown(delta: float) -> void:
-	_trigger_timer = max(_trigger_timer - delta, 0.0)
+func _process_dip_and_vibration(delta: float) -> void:
+	# Smoothly interpolate the vertical dip offset
+	_current_dip_y = move_toward(_current_dip_y, _target_dip_y, dip_speed * delta)
+	global_position.y = _initial_position.y + _current_dip_y
 
-	# Progress from 1.0 (just stepped on) to 0.0 (about to fall)
-	var progress: float = _trigger_timer / trigger_delay if trigger_delay > 0.0 else 0.0
+	if _state == PlatformState.TRIGGERED:
+		_trigger_timer = max(_trigger_timer - delta, 0.0)
 
-	# Reduces the animation speed progressively (from 1.0 to min_animation_speed_scale)
-	animated_sprite.speed_scale = lerp(min_animation_speed_scale, 1.0, progress)
+		# Progress from 1.0 (just stepped on) to 0.0 (about to fall)
+		var progress: float = _trigger_timer / trigger_delay if trigger_delay > 0.0 else 0.0
 
-	# Applies the vibration to the sprite
-	var current_shake: float = lerp(shake_intensity, 0.5, progress)
-	var offset_x := randf_range(-current_shake, current_shake)
-	var offset_y := randf_range(-current_shake, current_shake)
-	animated_sprite.offset = Vector2(offset_x, offset_y)
+		# Reduces the animation speed progressively
+		animated_sprite.speed_scale = lerp(min_animation_speed_scale, 1.0, progress)
 
-	if _trigger_timer <= 0.0:
-		_start_falling()
+		# Applies vibration offset to sprite
+		var current_shake: float = lerp(shake_intensity, 0.5, progress)
+		var offset_x := randf_range(-current_shake, current_shake)
+		var offset_y := randf_range(-current_shake, current_shake)
+		animated_sprite.offset = Vector2(offset_x, offset_y)
+
+		if _trigger_timer <= 0.0:
+			_start_falling()
 
 
 func _process_fall(delta: float) -> void:
@@ -72,13 +85,26 @@ func _process_fall(delta: float) -> void:
 
 
 func _on_player_entered(body: Node2D) -> void:
-	if _state != PlatformState.IDLE:
+	if not _is_player(body):
 		return
 
-	if not body.is_in_group("player") and not body.has_method("take_damage"):
+	_target_dip_y = dip_distance
+
+	if _state == PlatformState.IDLE:
+		_trigger_platform()
+
+
+func _on_player_exited(body: Node2D) -> void:
+	if not _is_player(body):
 		return
 
-	_trigger_platform()
+	# When player leaves, spring back up unless it is already falling
+	if _state != PlatformState.FALLING:
+		_target_dip_y = 0.0
+
+
+func _is_player(body: Node2D) -> bool:
+	return body.is_in_group("player") or body.has_method("take_damage")
 
 
 func _trigger_platform() -> void:
@@ -89,21 +115,22 @@ func _trigger_platform() -> void:
 func _start_falling() -> void:
 	_state = PlatformState.FALLING
 	_reset_timer = reset_time
+	_target_dip_y = 0.0
+	_current_dip_y = 0.0
 
-	# Disables the vibration and turns off the motors ("off") before falling
 	animated_sprite.offset = Vector2.ZERO
 	animated_sprite.speed_scale = 1.0
 	animated_sprite.play("off")
 
-	# Disables the physical collision so the player falls
 	collision_shape.set_deferred("disabled", true)
 
 
 func _reset_to_idle() -> void:
 	_state = PlatformState.IDLE
+	_target_dip_y = 0.0
+	_current_dip_y = 0.0
 	global_position = _initial_position
 
-	# Restarts with the "on" animation at normal speed
 	animated_sprite.offset = Vector2.ZERO
 	animated_sprite.speed_scale = 1.0
 	animated_sprite.play("on")

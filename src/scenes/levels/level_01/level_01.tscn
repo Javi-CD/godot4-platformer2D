@@ -116,6 +116,7 @@ variant = 1
 
 [node name="FallingPlatform" parent="Traps" unique_id=808692909 instance=ExtResource("7_qu1h2")]
 position = Vector2(192, 192)
+min_animation_speed_scale = 0.05
 shake_intensity = 0.5
 fall_speed = 250.0
 
