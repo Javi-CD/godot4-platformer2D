@@ -1,3 +1,4 @@
+class_name RockHead
 extends CharacterBody2D
 
 

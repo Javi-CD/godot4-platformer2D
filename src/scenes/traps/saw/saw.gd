@@ -1,4 +1,4 @@
-#@tool
+class_name Saw
 extends Node2D
 
 

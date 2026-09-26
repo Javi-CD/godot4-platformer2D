@@ -1,3 +1,4 @@
+class_name ExitFlag
 extends Area2D
 
 

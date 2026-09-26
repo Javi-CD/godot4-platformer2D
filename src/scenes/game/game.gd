@@ -1,3 +1,4 @@
+class_name Game
 extends Node
 
 
@@ -5,10 +6,10 @@ extends Node
 
 
 @onready var level_container: Node = $LevelContainer
-@onready var hud: CanvasLayer = $HUD
+@onready var hud: HUD = $HUD
 
 
-var _current_level: Node = null
+var _current_level: Level = null
 
 
 func _ready() -> void:
@@ -24,16 +25,19 @@ func load_level(level_path: String) -> void:
 		_current_level.queue_free()
 		_current_level = null
 
-	var level_scene := load(level_path)
+	var level_scene := load(level_path) as PackedScene
 	if level_scene == null:
 		push_warning("No se pudo cargar la escena: " + level_path)
 		return
 
-	_current_level = level_scene.instantiate()
-	level_container.add_child(_current_level)
+	var instantiated := level_scene.instantiate()
+	if not instantiated is Level:
+		push_warning("La escena cargada no es de tipo Level: " + level_path)
+		return
 
-	if _current_level.has_signal("level_completed"):
-		_current_level.level_completed.connect(_on_level_completed)
+	_current_level = instantiated as Level
+	level_container.add_child(_current_level)
+	_current_level.level_completed.connect(_on_level_completed)
 
 	_assign_level_player_to_hud()
 	_start_player_level_spawn()
@@ -41,30 +45,19 @@ func load_level(level_path: String) -> void:
 
 func _assign_level_player_to_hud() -> void:
 	if _current_level == null:
-		if hud.has_method("set_player"):
-			hud.set_player(null)
+		hud.set_player(null)
 		return
 
-	if _current_level.has_method("get_player"):
-		hud.set_player(_current_level.get_player())
-	else:
-		var player := _current_level.get_node_or_null("Player")
-		if hud.has_method("set_player"):
-			hud.set_player(player)
+	var player := _current_level.get_player()
+	hud.set_player(player)
 
 
 func _start_player_level_spawn() -> void:
 	if _current_level == null:
 		return
 
-	var player: Node = null
-
-	if _current_level.has_method("get_player"):
-		player = _current_level.get_player()
-	else:
-		player = _current_level.get_node_or_null("Player")
-
-	if player != null and player.has_method("start_level_spawn"):
+	var player := _current_level.get_player()
+	if player != null:
 		player.start_level_spawn()
 
 
