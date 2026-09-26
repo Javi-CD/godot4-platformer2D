@@ -328,7 +328,6 @@ func enter_death_state(source_position: Vector2) -> void:
 
 	sprite.flip_h = hit_direction < 0.0
 	play_animation(&"hurt")
-	sprite.pause()
 
 
 func update_death_state(delta: float) -> void:
@@ -423,6 +422,10 @@ func _finish_level_spawn() -> void:
 
 
 func _on_sprite_animation_finished() -> void:
+	if sprite.animation == "hurt":
+		sprite.frame = 6
+		sprite.pause()
+		return
 	if sprite.animation == "respawn":
 		if current_spawn_mode == &"respawn":
 			_finish_respawn()
