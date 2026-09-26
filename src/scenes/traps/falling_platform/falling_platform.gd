@@ -5,11 +5,13 @@ extends AnimatableBody2D
 enum PlatformState {
 	IDLE,
 	TRIGGERED,
+	OFF_WAIT,
 	FALLING
 }
 
 @export_group("Timing & Delays")
-@export_range(0.1, 3.0, 0.05) var trigger_delay := 0.6
+@export_range(0.1, 3.0, 0.05) var trigger_delay := 0.5
+@export_range(0.05, 1.0, 0.05) var off_delay := 0.2
 @export_range(0.5, 10.0, 0.5) var reset_time := 3.0
 
 @export_group("Vibration & Weight Dip")
@@ -23,10 +25,12 @@ enum PlatformState {
 @onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
 @onready var player_detector_area: Area2D = $PlayerDetectorArea
+@onready var air_particles: CPUParticles2D = get_node_or_null("AirParticles")
 
 var _state := PlatformState.IDLE
 var _initial_position := Vector2.ZERO
 var _trigger_timer := 0.0
+var _off_timer := 0.0
 var _reset_timer := 0.0
 
 var _target_dip_y := 0.0
@@ -42,7 +46,7 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	match _state:
-		PlatformState.IDLE, PlatformState.TRIGGERED:
+		PlatformState.IDLE, PlatformState.TRIGGERED, PlatformState.OFF_WAIT:
 			_process_dip_and_vibration(delta)
 
 		PlatformState.FALLING:
@@ -66,6 +70,11 @@ func _process_dip_and_vibration(delta: float) -> void:
 			animated_sprite.offset = Vector2.ZERO
 
 		if _trigger_timer <= 0.0:
+			_start_engine_off()
+
+	elif _state == PlatformState.OFF_WAIT:
+		_off_timer = max(_off_timer - delta, 0.0)
+		if _off_timer <= 0.0:
 			_start_falling()
 
 
@@ -91,8 +100,8 @@ func _on_player_exited(body: Node2D) -> void:
 	if not _is_player(body):
 		return
 
-	# When player leaves, spring back up unless it is already falling
-	if _state != PlatformState.FALLING:
+	# When player leaves, spring back up unless it is already falling or off
+	if _state != PlatformState.FALLING and _state != PlatformState.OFF_WAIT:
 		_target_dip_y = 0.0
 
 
@@ -105,16 +114,26 @@ func _trigger_platform() -> void:
 	_trigger_timer = trigger_delay
 
 
+func _start_engine_off() -> void:
+	_state = PlatformState.OFF_WAIT
+	_off_timer = off_delay
+
+	# Stop vibration and switch animation to "off"
+	animated_sprite.offset = Vector2.ZERO
+	animated_sprite.play("off")
+
+	# Immediately stop particle emission
+	if air_particles != null:
+		air_particles.emitting = false
+
+
 func _start_falling() -> void:
 	_state = PlatformState.FALLING
 	_reset_timer = reset_time
 	_target_dip_y = 0.0
 	_current_dip_y = 0.0
 
-	animated_sprite.offset = Vector2.ZERO
-	animated_sprite.speed_scale = 1.0
-	animated_sprite.play("off")
-
+	# Disable physical collision so the player falls
 	collision_shape.set_deferred("disabled", true)
 
 
@@ -127,5 +146,8 @@ func _reset_to_idle() -> void:
 	animated_sprite.offset = Vector2.ZERO
 	animated_sprite.speed_scale = 1.0
 	animated_sprite.play("on")
+
+	if air_particles != null:
+		air_particles.emitting = true
 
 	collision_shape.set_deferred("disabled", false)
