@@ -17,11 +17,13 @@ var _total_fruits := 0
 var _collected_fruits := 0
 var _is_completed := false
 var _fruits: Array[Area2D] = []
+var _resettable_traps: Array[Node] = []
 var _is_waiting_for_player_exit := false
 
 
 func _ready() -> void:
 	_setup_fruits()
+	_setup_resettable_traps()
 	_update_exit_state()
 
 	if exit_flag != null and exit_flag.has_signal("player_entered"):
@@ -68,6 +70,26 @@ func _find_fruits(root: Node) -> Array[Area2D]:
 		fruits.append_array(_find_fruits(child))
 
 	return fruits
+
+
+func _setup_resettable_traps() -> void:
+	_resettable_traps.clear()
+	_resettable_traps = _find_resettable_traps(self)
+
+
+func _find_resettable_traps(root: Node) -> Array[Node]:
+	var traps: Array[Node] = []
+
+	if root == null:
+		return traps
+
+	for child in root.get_children():
+		if child.has_method("reset_platform"):
+			traps.append(child)
+
+		traps.append_array(_find_resettable_traps(child))
+
+	return traps
 
 
 func _on_fruit_collected(_fruit_type: StringName) -> void:
@@ -122,6 +144,7 @@ func _on_player_level_exit_finished() -> void:
 
 func _on_player_respawned() -> void:
 	_reset_level_collectables()
+	_reset_level_traps()
 	_collected_fruits = 0
 	_is_completed = false
 	_is_waiting_for_player_exit = false
@@ -132,3 +155,9 @@ func _reset_level_collectables() -> void:
 	for fruit in _fruits:
 		if fruit.has_method("reset_fruit"):
 			fruit.reset_fruit()
+
+
+func _reset_level_traps() -> void:
+	for trap in _resettable_traps:
+		if trap.has_method("reset_platform"):
+			trap.reset_platform()

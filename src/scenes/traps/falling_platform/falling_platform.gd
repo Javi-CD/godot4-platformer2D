@@ -137,10 +137,17 @@ func _start_falling() -> void:
 	collision_shape.set_deferred("disabled", true)
 
 
+func reset_platform() -> void:
+	_reset_to_idle()
+
+
 func _reset_to_idle() -> void:
 	_state = PlatformState.IDLE
 	_target_dip_y = 0.0
 	_current_dip_y = 0.0
+	_trigger_timer = 0.0
+	_off_timer = 0.0
+	_reset_timer = 0.0
 	global_position = _initial_position
 
 	animated_sprite.offset = Vector2.ZERO
