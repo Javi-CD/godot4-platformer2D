@@ -10,7 +10,9 @@ enum FruitType {
 	APPLE,
 	BANANA,
 	KIWI,
-	PINEAPPLE
+	PINEAPPLE,
+	MELON,
+	CHERRY
 }
 
 
@@ -53,6 +55,10 @@ func _update_fruit_visual() -> void:
 			fruit_sprite.play("kiwi")
 		FruitType.PINEAPPLE:
 			fruit_sprite.play("pineapple")
+		FruitType.MELON:
+			fruit_sprite.play("melon")
+		FruitType.CHERRY:
+			fruit_sprite.play("cherry")
 
 
 func _on_body_entered(body: Node) -> void:
@@ -102,5 +108,9 @@ func _get_fruit_name() -> StringName:
 			return &"kiwi"
 		FruitType.PINEAPPLE:
 			return &"pineapple"
+		FruitType.MELON:
+			return &"melon"
+		FruitType.CHERRY:
+			return &"cherry"
 
 	return &"unknown"
