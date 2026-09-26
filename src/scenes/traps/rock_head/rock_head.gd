@@ -23,6 +23,11 @@ enum MovementMode {
 @export_range(0.5, 10.0, 0.1) var blink_interval_min := 2.0
 @export_range(0.5, 10.0, 0.1) var blink_interval_max := 4.5
 
+@export_group("Screen Shake")
+@export var enable_screen_shake := true
+@export_range(0.5, 10.0, 0.5) var shake_intensity := 3.5
+@export_range(0.05, 0.5, 0.05) var shake_duration := 0.15
+
 
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var player_detector: Area2D = $PlayerDetector
@@ -178,6 +183,9 @@ func _play_hit_animation_from_direction(direction: Vector2) -> void:
 
 	_is_playing_hit_animation = true
 	sprite.play(animation_name)
+
+	if enable_screen_shake:
+		MainCamera.shake(shake_intensity, shake_duration)
 
 
 func _update_blink_timer(delta: float) -> void:

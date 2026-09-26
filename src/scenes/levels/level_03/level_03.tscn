@@ -192,6 +192,8 @@ position = Vector2(160, 272)
 max_speed = 250.0
 slow_down_distance = 5.0
 use_point_delay = true
+shake_intensity = 1.0
+shake_duration = 0.1
 
 [node name="Path" type="Node2D" parent="Traps/RockHead" unique_id=1381541002]
 
@@ -205,6 +207,8 @@ position = Vector2(40, 272)
 max_speed = 250.0
 slow_down_distance = 5.0
 use_point_delay = true
+shake_intensity = 1.0
+shake_duration = 0.1
 
 [node name="Path" type="Node2D" parent="Traps/RockHead2" unique_id=1800718884]
 
@@ -219,6 +223,8 @@ max_speed = 250.0
 slow_down_distance = 5.0
 movement_mode = 1
 use_point_delay = true
+shake_intensity = 1.0
+shake_duration = 0.1
 
 [node name="Path" type="Node2D" parent="Traps/RockHead3" unique_id=2043603185]
 position = Vector2(32, -16)
@@ -241,6 +247,8 @@ max_speed = 250.0
 slow_down_distance = 5.0
 movement_mode = 1
 use_point_delay = true
+shake_intensity = 1.0
+shake_duration = 0.1
 
 [node name="Path" type="Node2D" parent="Traps/RockHead4" unique_id=727752208]
 position = Vector2(32, -16)
