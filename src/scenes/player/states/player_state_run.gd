@@ -12,13 +12,10 @@ func physics_update(delta: float) -> void:
 	player.move_and_slide()
 
 	if not player.is_on_floor():
-		if player.velocity.y > 0.0:
-			state_machine.transition_to(&"Fall")
-		else:
-			state_machine.transition_to(&"Jump")
+		state_machine.transition_to(&"Fall")
 		return
 
-	if player.jump_buffer_timer > 0.0:
+	if player.jump_buffer_timer > 0.0 and player.can_ground_jump():
 		state_machine.transition_to(&"Jump")
 		return
 
