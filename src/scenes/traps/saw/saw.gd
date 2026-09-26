@@ -35,6 +35,8 @@ func _ready() -> void:
 	if _local_points.size() > 0:
 		global_position = _initial_position + _local_points[0]
 		_current_index = _get_next_point_index()
+		if use_point_delay and point_delay > 0.0:
+			_delay_timer = point_delay
 
 
 func reset_platform() -> void:
@@ -45,6 +47,8 @@ func reset_platform() -> void:
 	if _local_points.size() > 0:
 		global_position = _initial_position + _local_points[0]
 		_current_index = _get_next_point_index()
+		if use_point_delay and point_delay > 0.0:
+			_delay_timer = point_delay
 
 
 func _physics_process(delta: float) -> void:

@@ -54,6 +54,7 @@ func _ready() -> void:
 	if _local_points.size() > 0:
 		global_position = _initial_position + _local_points[0]
 		_current_index = _get_next_point_index()
+		_start_point_delay_if_needed()
 
 	sprite.animation_finished.connect(_on_sprite_animation_finished)
 	_reset_blink_timer()
@@ -71,6 +72,7 @@ func reset_platform() -> void:
 	if _local_points.size() > 0:
 		global_position = _initial_position + _local_points[0]
 		_current_index = _get_next_point_index()
+		_start_point_delay_if_needed()
 
 	_reset_blink_timer()
 	_play_idle()

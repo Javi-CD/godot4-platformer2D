@@ -38,20 +38,21 @@ func load_level(level_path: String) -> void:
 		push_warning("load_level recibió una ruta vacía.")
 		return
 
-	if _current_level_path != level_path:
+	var level_scene := load(level_path) as PackedScene
+	if level_scene == null:
+		push_warning("No se pudo cargar la escena: " + level_path)
+		return
+
+	var canonical_path := level_scene.resource_path
+	if _current_level_path != canonical_path:
 		_previous_level_path = _current_level_path
 
-	_current_level_path = level_path
+	_current_level_path = canonical_path
 	_update_current_level_index()
 
 	if _current_level != null:
 		_current_level.queue_free()
 		_current_level = null
-
-	var level_scene := load(level_path) as PackedScene
-	if level_scene == null:
-		push_warning("No se pudo cargar la escena: " + level_path)
-		return
 
 	var instantiated := level_scene.instantiate() as Node2D
 	if instantiated == null:
