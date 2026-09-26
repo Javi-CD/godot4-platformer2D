@@ -73,6 +73,7 @@ var wall_jump_lock_timer := 0.0
 var input_direction := 0.0
 var jump_pressed := false
 var jump_released := false
+var _step_timer := 0.0
 
 var current_spawn_mode := &"respawn"
 
@@ -509,7 +510,14 @@ func _update_run_dust() -> void:
 	if not is_moving_on_floor:
 		if dust_effect.emitting:
 			dust_effect.emitting = false
+		_step_timer = 0.0
 		return
+
+	var delta := get_physics_process_delta_time()
+	_step_timer -= delta
+	if _step_timer <= 0.0:
+		_step_timer = 0.22
+		SoundManager.play_sfx("steps", 0.1)
 
 	dust_effect.global_position = dust_spawn_floor.global_position
 	if velocity.x > 0.0:

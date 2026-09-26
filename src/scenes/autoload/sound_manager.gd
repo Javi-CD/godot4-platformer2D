@@ -11,6 +11,7 @@ extends Node
 	"bump": preload("res://assets/Sounds/Bump.wav"),
 	"fruit_collect": preload("res://assets/Sounds/fruit_collect.wav"),
 	"level_complete": preload("res://assets/Sounds/level_complete.wav"),
+	"steps": preload("res://assets/Sounds/steps.wav"),
 }
 
 @onready var sfx_player: AudioStreamPlayer = $SFXPlayer
