@@ -43,13 +43,12 @@ func _attach_click_animation(button: TextureButton) -> void:
 		button.resized.connect(_on_button_resized.bind(button))
 
 	button.button_down.connect(func():
-		if SoundManager != null and SoundManager.has_method("play_sfx"):
-			SoundManager.play_sfx("click", 0.05)
+		SoundManager.play_sfx("click", 0.05)
 
 		var tween := button.create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 		tween.tween_property(button, "scale", Vector2(0.85, 0.85), 0.06)
 		tween.parallel().tween_property(button, "modulate", Color(0.75, 0.75, 0.75), 0.06)
-	)
+	)s
 
 	button.button_up.connect(func():
 		var tween := button.create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)

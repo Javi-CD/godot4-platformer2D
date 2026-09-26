@@ -271,8 +271,7 @@ func perform_ground_jump() -> void:
 	coyote_timer = 0.0
 	performed_double_jump = false
 	_emit_jump_dust()
-	if SoundManager != null and SoundManager.has_method("play_sfx"):
-		SoundManager.play_sfx("jump", 0.06)
+	SoundManager.play_sfx("jump", 0.06)
 
 
 func perform_double_jump() -> void:
@@ -281,8 +280,7 @@ func perform_double_jump() -> void:
 	coyote_timer = 0.0
 	air_jumps_used += 1
 	performed_double_jump = true
-	if SoundManager != null and SoundManager.has_method("play_sfx"):
-		SoundManager.play_sfx("jump", 0.12)
+	SoundManager.play_sfx("jump", 0.12)
 
 
 func perform_wall_jump() -> void:
@@ -299,8 +297,7 @@ func perform_wall_jump() -> void:
 	wall_jump_lock_timer = WALL_JUMP_LOCK_TIME
 
 	sprite.flip_h = jump_dir < 0.0
-	if SoundManager != null and SoundManager.has_method("play_sfx"):
-		SoundManager.play_sfx("jump", 0.08)
+	SoundManager.play_sfx("jump", 0.08)
 
 
 func play_animation(animation_name: StringName) -> void:
@@ -456,8 +453,7 @@ func enter_hurt_state(source_position: Vector2) -> void:
 
 	sprite.flip_h = hit_direction < 0.0
 	play_animation(&"hurt")
-	if SoundManager != null and SoundManager.has_method("play_sfx"):
-		SoundManager.play_sfx("hurt")
+	SoundManager.play_sfx("hurt")
 
 
 func _on_sprite_animation_finished() -> void:
