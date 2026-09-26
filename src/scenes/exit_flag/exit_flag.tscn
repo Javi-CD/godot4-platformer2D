@@ -341,7 +341,7 @@ animations = [{
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_01i8w"]
-size = Vector2(34, 48)
+size = Vector2(26, 42)
 
 [node name="ExitFlag" type="Area2D" unique_id=1798764526]
 collision_layer = 16
@@ -350,10 +350,10 @@ script = ExtResource("1_upjor")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=360284270]
 sprite_frames = SubResource("SpriteFrames_nmp4d")
-animation = &"idle"
+animation = &"winner"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=222816679]
-position = Vector2(-3, 8)
+position = Vector2(0, 11)
 shape = SubResource("RectangleShape2D_01i8w")
 
 [connection signal="animation_finished" from="AnimatedSprite2D" to="." method="_on_animated_sprite_2d_animation_finished"]

@@ -2,6 +2,9 @@
 
 [ext_resource type="SpriteFrames" uid="uid://cq5kr1fm7xdn2" path="res://src/frames/hearts/hearts.tres" id="1_drnvm"]
 [ext_resource type="Script" uid="uid://dnue4rqo28ba4" path="res://src/scenes/hud/hud.gd" id="1_so2yk"]
+[ext_resource type="Texture2D" uid="uid://dkamjnq7tnktw" path="res://assets/Menu/Buttons/Previous.png" id="3_i7kav"]
+[ext_resource type="Texture2D" uid="uid://cefwbbb731ctf" path="res://assets/Menu/Buttons/Restart.png" id="4_m1ddw"]
+[ext_resource type="Texture2D" uid="uid://bt5iuvt8vkvwb" path="res://assets/Menu/Buttons/Next.png" id="5_sdd5v"]
 
 [node name="HUD" type="CanvasLayer" unique_id=514685715]
 script = ExtResource("1_so2yk")
@@ -11,3 +14,31 @@ z_index = 3
 position = Vector2(10, 10)
 sprite_frames = ExtResource("1_drnvm")
 animation = &"state_0"
+
+[node name="NavigationContainer" type="MarginContainer" parent="." unique_id=1980603083]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -40.0
+offset_bottom = 40.0
+grow_horizontal = 0
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+
+[node name="HBoxContainer" type="HBoxContainer" parent="NavigationContainer" unique_id=1537355225]
+layout_mode = 2
+
+[node name="PreviousButton" type="TextureButton" parent="NavigationContainer/HBoxContainer" unique_id=71938230]
+layout_mode = 2
+focus_mode = 0
+texture_normal = ExtResource("3_i7kav")
+
+[node name="RestartButton" type="TextureButton" parent="NavigationContainer/HBoxContainer" unique_id=1541482159]
+layout_mode = 2
+focus_mode = 0
+texture_normal = ExtResource("4_m1ddw")
+
+[node name="NextButton" type="TextureButton" parent="NavigationContainer/HBoxContainer" unique_id=528759033]
+layout_mode = 2
+focus_mode = 0
+texture_normal = ExtResource("5_sdd5v")

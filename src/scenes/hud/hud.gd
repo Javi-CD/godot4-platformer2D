@@ -2,10 +2,27 @@ class_name HUD
 extends CanvasLayer
 
 
+signal previous_level_requested
+signal restart_level_requested
+signal next_level_requested
+
+
 @onready var heart_display: AnimatedSprite2D = $HeartDisplay
+@onready var previous_button: TextureButton = get_node_or_null("NavigationContainer/HBoxContainer/PreviousButton")
+@onready var restart_button: TextureButton = get_node_or_null("NavigationContainer/HBoxContainer/RestartButton")
+@onready var next_button: TextureButton = get_node_or_null("NavigationContainer/HBoxContainer/NextButton")
 
 
 var _player: Node = null
+
+
+func _ready() -> void:
+	if previous_button != null:
+		previous_button.pressed.connect(func(): emit_signal("previous_level_requested"))
+	if restart_button != null:
+		restart_button.pressed.connect(func(): emit_signal("restart_level_requested"))
+	if next_button != null:
+		next_button.pressed.connect(func(): emit_signal("next_level_requested"))
 
 
 func set_player(player: Node) -> void:
