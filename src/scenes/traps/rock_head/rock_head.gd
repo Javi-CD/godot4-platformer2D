@@ -208,6 +208,8 @@ func _play_hit_animation_from_direction(direction: Vector2) -> void:
 	if enable_screen_shake:
 		MainCamera.shake(shake_intensity, shake_duration)
 
+	SoundManager.play_sfx("bump", 0.05)
+
 
 func _update_blink_timer(delta: float) -> void:
 	if not use_blink:

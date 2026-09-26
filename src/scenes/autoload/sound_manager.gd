@@ -8,6 +8,7 @@ extends Node
 	"jump": preload("res://assets/Sounds/Jump.wav"),
 	"hurt": preload("res://assets/Sounds/Hurt.wav"),
 	"trampoline": preload("res://assets/Sounds/Trampoline.wav"),
+	"bump": preload("res://assets/Sounds/Bump.wav"),
 }
 
 @onready var sfx_player: AudioStreamPlayer = $SFXPlayer
