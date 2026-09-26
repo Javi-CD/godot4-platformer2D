@@ -33,11 +33,19 @@ func _connect_hud_signals() -> void:
 		hud.next_level_requested.connect(_on_next_level_requested)
 
 
-func load_level(level_path: String) -> void:
+func load_level(level_path: String, animate: bool = true) -> void:
 	if level_path.is_empty():
 		push_warning("load_level recibió una ruta vacía.")
 		return
 
+	var scene_mgr = get_node_or_null("/root/SceneManager")
+	if animate and scene_mgr != null and scene_mgr.has_method("play_transition") and _current_level != null:
+		await scene_mgr.play_transition(func(): _load_level_internal(level_path))
+	else:
+		_load_level_internal(level_path)
+
+
+func _load_level_internal(level_path: String) -> void:
 	var level_scene := load(level_path) as PackedScene
 	if level_scene == null:
 		push_warning("No se pudo cargar la escena: " + level_path)
