@@ -2,7 +2,6 @@ class_name Player
 extends CharacterBody2D
 
 
-signal health_changed(current_health: int, max_health: int)
 signal respawned
 signal level_exit_finished
 
@@ -39,26 +38,16 @@ const MAX_FALL_SPEED := 500.0
 # Jump forgiveness
 const COYOTE_TIME := 0.1
 
-# Health and respawn tuning
-const MAX_HEALTH := 4
-const RESPAWN_INVULNERABILITY_DURATION := 1.0
-const LEVEL_SPAWN_INVULNERABILITY_DURATION := 0.5
-
-# Hurt tuning
-const HURT_DURATION := 0.35
-const INVULNERABILITY_DURATION := 0.6
-const HURT_KNOCKBACK_X := 230.0
-const HURT_KNOCKBACK_Y := -190.0
-
-# Invulnerability visual feedback
-const INVULNERABILITY_FLASH_SPEED := 18.0
-const INVULNERABILITY_MIN_ALPHA := 0.45
+# Arcade Death tuning
+const DEATH_JUMP_VELOCITY := -300.0
+const DEATH_HORIZONTAL_SPEED := 120.0
+const DEATH_ROTATION_SPEED := 9.0
+const DEATH_FALL_DISTANCE := 200.0
 
 # State machine reference
 var state_machine: StateMachine = null
 
 # Runtime state variables
-var current_health := MAX_HEALTH
 var respawn_position := Vector2.ZERO
 
 var coyote_timer := 0.0
@@ -66,14 +55,16 @@ var jump_buffer_timer := 0.0
 var air_jumps_used := 0
 var performed_double_jump := false
 
-var hurt_timer := 0.0
-var invulnerability_timer := 0.0
 var wall_jump_lock_timer := 0.0
 
 var input_direction := 0.0
 var jump_pressed := false
 var jump_released := false
 var _step_timer := 0.0
+
+var is_dying := false
+var death_velocity := Vector2.ZERO
+var death_direction := 1.0
 
 var current_spawn_mode := &"respawn"
 
@@ -93,7 +84,6 @@ func _ready() -> void:
 
 	respawn_position = global_position
 	sprite.animation_finished.connect(_on_sprite_animation_finished)
-	_emit_health_changed()
 
 	_setup_state_machine()
 
@@ -144,7 +134,6 @@ func _physics_process(delta: float) -> void:
 
 	state_machine.physics_update(delta)
 
-	_update_invulnerability_feedback()
 	_update_run_dust()
 	_update_wall_slide_dust()
 
@@ -156,14 +145,6 @@ func _read_input() -> void:
 
 
 func _update_timers(delta: float) -> void:
-	if hurt_timer > 0.0:
-		hurt_timer = max(hurt_timer - delta, 0.0)
-
-	if invulnerability_timer > 0.0:
-		invulnerability_timer = max(invulnerability_timer - delta, 0.0)
-		if invulnerability_timer == 0.0:
-			_reset_invulnerability_feedback()
-
 	if wall_jump_lock_timer > 0.0:
 		wall_jump_lock_timer = max(wall_jump_lock_timer - delta, 0.0)
 
@@ -313,56 +294,57 @@ func _get_wall_direction() -> float:
 	return -wall_normal.x
 
 
-func _update_invulnerability_feedback() -> void:
-	if not is_invulnerable():
-		return
-
-	var time := Time.get_ticks_msec() / 1000.0
-	var pulse := (sin(time * INVULNERABILITY_FLASH_SPEED) + 1.0) * 0.5
-	var alpha: float = lerp(INVULNERABILITY_MIN_ALPHA, 1.0, pulse)
-
-	sprite.modulate.a = alpha
-
-
-func _reset_invulnerability_feedback() -> void:
-	sprite.modulate.a = 1.0
-
-
-func is_invulnerable() -> bool:
-	return invulnerability_timer > 0.0
-
-
-func get_current_health() -> int:
-	return current_health
-
-
-func get_max_health() -> int:
-	return MAX_HEALTH
-
-
-func take_damage(source_position: Vector2, amount: int = 1) -> void:
-	if is_invulnerable():
-		return
-
-	if amount <= 0:
-		return
-
-	current_health = max(current_health - amount, 0)
-	_emit_health_changed()
-
-	if current_health <= 0:
-		state_machine.transition_to(&"Respawn", {"mode": &"respawn"})
+func take_damage(source_position: Vector2, _amount: int = 1) -> void:
+	if is_dying:
 		return
 
 	state_machine.transition_to(&"Hurt", {"source_position": source_position})
 
 
-func heal(amount: int = 1) -> void:
-	if amount <= 0:
+func enter_death_state(source_position: Vector2) -> void:
+	if is_dying:
 		return
 
-	current_health = min(current_health + amount, MAX_HEALTH)
-	_emit_health_changed()
+	is_dying = true
+	SoundManager.play_sfx("hurt")
+
+	var hit_direction: float = sign(global_position.x - source_position.x)
+	if hit_direction == 0.0:
+		hit_direction = 1.0
+
+	death_direction = hit_direction
+	death_velocity = Vector2(hit_direction * DEATH_HORIZONTAL_SPEED, DEATH_JUMP_VELOCITY)
+
+	coyote_timer = 0.0
+	jump_buffer_timer = 0.0
+	wall_jump_lock_timer = 0.0
+
+	collision_shape.set_deferred("disabled", true)
+
+	if dust_effect != null:
+		dust_effect.emitting = false
+	if wall_dust_effect != null:
+		wall_dust_effect.emitting = false
+
+	sprite.flip_h = hit_direction < 0.0
+	play_animation(&"hurt")
+	sprite.pause()
+
+
+func update_death_state(delta: float) -> void:
+	var gravity := get_gravity()
+	death_velocity += gravity * FALL_GRAVITY_MULTIPLIER * delta
+	global_position += death_velocity * delta
+	rotation += death_direction * DEATH_ROTATION_SPEED * delta
+
+	if death_velocity.y > 0.0 and global_position.y > respawn_position.y + DEATH_FALL_DISTANCE:
+		_finish_death_and_respawn()
+
+
+func _finish_death_and_respawn() -> void:
+	is_dying = false
+	rotation = 0.0
+	state_machine.transition_to(&"Respawn", {"mode": &"respawn"})
 
 
 func set_respawn_point(new_respawn_position: Vector2) -> void:
@@ -381,34 +363,32 @@ func start_respawn_internal() -> void:
 	current_spawn_mode = &"respawn"
 	global_position = respawn_position
 	velocity = Vector2.ZERO
-	current_health = MAX_HEALTH
+	rotation = 0.0
+	is_dying = false
 
 	coyote_timer = 0.0
 	jump_buffer_timer = 0.0
 	air_jumps_used = 0
 	performed_double_jump = false
-
-	hurt_timer = 0.0
-	invulnerability_timer = RESPAWN_INVULNERABILITY_DURATION
 	wall_jump_lock_timer = 0.0
 
-	collision_shape.disabled = true
+	collision_shape.set_deferred("disabled", true)
 	sprite.visible = true
 
-	_emit_health_changed()
 	play_animation(&"respawn")
 
 
 func start_level_spawn_internal() -> void:
 	current_spawn_mode = &"level_spawn"
 	velocity = Vector2.ZERO
+	rotation = 0.0
+	is_dying = false
 
 	jump_buffer_timer = 0.0
 	coyote_timer = 0.0
 	wall_jump_lock_timer = 0.0
 
-	invulnerability_timer = LEVEL_SPAWN_INVULNERABILITY_DURATION
-	collision_shape.disabled = true
+	collision_shape.set_deferred("disabled", true)
 	sprite.visible = true
 
 	play_animation(&"respawn")
@@ -417,44 +397,29 @@ func start_level_spawn_internal() -> void:
 func start_level_exit_internal() -> void:
 	current_spawn_mode = &"level_exit"
 	velocity = Vector2.ZERO
+	rotation = 0.0
 
 	jump_buffer_timer = 0.0
 	coyote_timer = 0.0
 	wall_jump_lock_timer = 0.0
 
-	collision_shape.disabled = true
+	collision_shape.set_deferred("disabled", true)
 	play_animation(&"desappearing")
 
 
 func _finish_respawn() -> void:
-	collision_shape.disabled = false
+	rotation = 0.0
+	is_dying = false
+	collision_shape.set_deferred("disabled", false)
 	state_machine.transition_to(&"Idle")
 	emit_signal("respawned")
 
 
 func _finish_level_spawn() -> void:
-	collision_shape.disabled = false
+	rotation = 0.0
+	is_dying = false
+	collision_shape.set_deferred("disabled", false)
 	state_machine.transition_to(&"Idle")
-
-
-func enter_hurt_state(source_position: Vector2) -> void:
-	var hit_direction: float = sign(global_position.x - source_position.x)
-	if hit_direction == 0.0:
-		hit_direction = 1.0
-
-	hurt_timer = HURT_DURATION
-	invulnerability_timer = INVULNERABILITY_DURATION
-
-	jump_buffer_timer = 0.0
-	coyote_timer = 0.0
-	wall_jump_lock_timer = 0.0
-
-	velocity.x = hit_direction * HURT_KNOCKBACK_X
-	velocity.y = HURT_KNOCKBACK_Y
-
-	sprite.flip_h = hit_direction < 0.0
-	play_animation(&"hurt")
-	SoundManager.play_sfx("hurt")
 
 
 func _on_sprite_animation_finished() -> void:
@@ -468,10 +433,6 @@ func _on_sprite_animation_finished() -> void:
 
 	if sprite.animation == "desappearing" and current_spawn_mode == &"level_exit":
 		emit_signal("level_exit_finished")
-
-
-func _emit_health_changed() -> void:
-	emit_signal("health_changed", current_health, MAX_HEALTH)
 
 
 func is_blocked_in_direction(direction: Vector2) -> bool:
