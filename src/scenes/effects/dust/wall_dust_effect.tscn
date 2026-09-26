@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://c0to8r32cvb7v"]
+
+[ext_resource type="Texture2D" uid="uid://d08gcv24f5jej" path="res://assets/Other/Dust Particle.png" id="1_ox4u2"]
+
+[sub_resource type="Curve" id="Curve_sneax"]
+_data = [Vector2(0.0094637275, 0.5721519), 0.0, 0.0, 0, 0, Vector2(1, 0.029114008), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[node name="WallDustEffect" type="CPUParticles2D" unique_id=1530966336]
+amount = 16
+texture = ExtResource("1_ox4u2")
+lifetime = 1.1500000000000001
+preprocess = 0.44
+speed_scale = 1.5
+fixed_fps = 30
+draw_order = 1
+direction = Vector2(0, -1)
+spread = 35.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 8.0
+initial_velocity_max = 16.0
+linear_accel_min = 10.0
+linear_accel_max = 15.0
+scale_amount_curve = SubResource("Curve_sneax")

@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://d17dc028f211v"]
+
+[ext_resource type="SpriteFrames" uid="uid://cq5kr1fm7xdn2" path="res://src/frames/hearts/hearts.tres" id="1_drnvm"]
+[ext_resource type="Script" uid="uid://dnue4rqo28ba4" path="res://src/scenes/hud/hud.gd" id="1_so2yk"]
+
+[node name="HUD" type="CanvasLayer" unique_id=514685715]
+script = ExtResource("1_so2yk")
+
+[node name="HeartDisplay" type="AnimatedSprite2D" parent="." unique_id=1562654719]
+z_index = 3
+position = Vector2(10, 10)
+sprite_frames = ExtResource("1_drnvm")
+animation = &"state_0"

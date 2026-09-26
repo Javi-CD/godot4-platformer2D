@@ -1,0 +1,61 @@
+[gd_scene format=3 uid="uid://duvbwwpm7oqix"]
+
+[ext_resource type="Texture2D" uid="uid://bm1yaxydm1ylu" path="res://assets/Traps/Spikes/spikes_4.png" id="1_37ylj"]
+[ext_resource type="Script" uid="uid://df4d011uvkh2j" path="res://src/scenes/traps/spikes/spikes.gd" id="1_aud4u"]
+[ext_resource type="Texture2D" uid="uid://cw27gieele613" path="res://assets/Traps/Spikes/spikes_6.png" id="2_aud4u"]
+[ext_resource type="Texture2D" uid="uid://cdc6sctgyib4x" path="res://assets/Traps/Spikes/Idle.png" id="2_p6yi0"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_p6yi0"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_p6yi0")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_37ylj")
+}],
+"loop": true,
+"name": &"spikes_4",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_aud4u")
+}],
+"loop": true,
+"name": &"spikes_6",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2lavx"]
+size = Vector2(32, 6)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_vyi8m"]
+size = Vector2(64, 6)
+
+[node name="Spikes" type="Area2D" unique_id=1081960643]
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("1_aud4u")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=314389398]
+sprite_frames = SubResource("SpriteFrames_p6yi0")
+animation = &"spikes_4"
+
+[node name="Collision4" type="CollisionShape2D" parent="." unique_id=1938303331]
+position = Vector2(0, 5)
+shape = SubResource("RectangleShape2D_2lavx")
+debug_color = Color(0.95493954, 1.9637346e-05, 0.4280977, 0.41960785)
+
+[node name="Collision6" type="CollisionShape2D" parent="." unique_id=1399376621]
+position = Vector2(0, 5)
+shape = SubResource("RectangleShape2D_vyi8m")
+disabled = true
+debug_color = Color(0.95640117, 0, 0.540705, 0.41960785)
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

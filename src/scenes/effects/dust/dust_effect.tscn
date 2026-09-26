@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://dxcq131jus7kb"]
+
+[ext_resource type="Texture2D" uid="uid://d08gcv24f5jej" path="res://assets/Other/Dust Particle.png" id="1_hc0j2"]
+
+[sub_resource type="Curve" id="Curve_iplsq"]
+_data = [Vector2(0, 0.76962024), 0.0, 0.0, 0, 0, Vector2(0.3028391, 0.5227848), 0.0, 0.0, 0, 0, Vector2(0.9621451, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[node name="DustEffect" type="CPUParticles2D" unique_id=1897845995]
+amount = 16
+texture = ExtResource("1_hc0j2")
+lifetime = 1.1500000000000001
+speed_scale = 1.5
+fixed_fps = 30
+draw_order = 1
+spread = 35.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 8.0
+initial_velocity_max = 16.0
+linear_accel_min = 5.0
+linear_accel_max = 10.0
+scale_amount_curve = SubResource("Curve_iplsq")
