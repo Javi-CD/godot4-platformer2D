@@ -15,6 +15,10 @@ run/main_scene="uid://baj8tlkymatdn"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[autoload]
+
+SoundManager="*uid://cht7fgcxf7f2q"
+
 [display]
 
 window/size/viewport_width=500
