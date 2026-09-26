@@ -46,6 +46,11 @@ func _ready() -> void:
 			ball_area.body_entered.connect(_on_ball_body_entered)
 
 
+func reset_platform() -> void:
+	_time_passed = 0.0
+	rotation = 0.0
+
+
 func _physics_process(delta: float) -> void:
 	if Engine.is_editor_hint():
 		return
