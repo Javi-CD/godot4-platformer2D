@@ -7,3 +7,5 @@ script = ExtResource("1_sound")
 
 [node name="SFXPlayer" type="AudioStreamPlayer" parent="." unique_id=980099816]
 max_polyphony = 8
+
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="." unique_id=892347102]

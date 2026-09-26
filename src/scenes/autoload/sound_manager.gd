@@ -14,7 +14,14 @@ extends Node
 	"steps": preload("res://assets/Sounds/steps.wav"),
 }
 
+@export var default_bgm: AudioStream = preload("res://assets/Sounds/Music/time_for_adventure.mp3")
+
 @onready var sfx_player: AudioStreamPlayer = $SFXPlayer
+@onready var music_player: AudioStreamPlayer = $MusicPlayer
+
+
+func _ready() -> void:
+	play_music()
 
 
 func play_sfx(sound_name: String, pitch_range: float = 0.0) -> void:
@@ -34,3 +41,22 @@ func play_sfx(sound_name: String, pitch_range: float = 0.0) -> void:
 		sfx_player.pitch_scale = 1.0
 
 	sfx_player.play()
+
+
+func play_music(stream: AudioStream = null) -> void:
+	var music_to_play: AudioStream = stream if stream != null else default_bgm
+	if music_to_play == null:
+		return
+
+	if music_to_play is AudioStreamMP3:
+		music_to_play.loop = true
+
+	if music_player.playing and music_player.stream == music_to_play:
+		return
+
+	music_player.stream = music_to_play
+	music_player.play()
+
+
+func stop_music() -> void:
+	music_player.stop()
