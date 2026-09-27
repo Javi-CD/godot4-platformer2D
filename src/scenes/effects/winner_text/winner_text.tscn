@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://jsvvx2k8ntk7"]
+
+[ext_resource type="Texture2D" uid="uid://cxh40428k2yya" path="res://assets/Menu/Text/Text (White) (8x10).png" id="1_cgs7f"]
+[ext_resource type="Script" uid="uid://dqg866e4m7q4p" path="res://src/scenes/effects/winner_text/winner_text.gd" id="2_wscript"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3tj4h"]
+atlas = ExtResource("1_cgs7f")
+region = Rect2(16, 20, 8, 10)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cgs7f"]
+atlas = ExtResource("1_cgs7f")
+region = Rect2(64, 0, 8, 10)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_q6i1s"]
+atlas = ExtResource("1_cgs7f")
+region = Rect2(24, 10, 8, 10)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8ndyj"]
+atlas = ExtResource("1_cgs7f")
+region = Rect2(32, 0, 8, 10)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kfyyy"]
+atlas = ExtResource("1_cgs7f")
+region = Rect2(56, 10, 8, 10)
+
+[node name="WinnerText" type="Node2D" unique_id=8014196]
+script = ExtResource("2_wscript")
+
+[node name="LettersContainer" type="Node2D" parent="." unique_id=1521965965]
+
+[node name="Letter_W" type="Sprite2D" parent="LettersContainer" unique_id=1637487482]
+texture = SubResource("AtlasTexture_3tj4h")
+
+[node name="Letter_I" type="Sprite2D" parent="LettersContainer" unique_id=1119520551]
+texture = SubResource("AtlasTexture_cgs7f")
+
+[node name="Letter_N1" type="Sprite2D" parent="LettersContainer" unique_id=351831105]
+texture = SubResource("AtlasTexture_q6i1s")
+
+[node name="Letter_N2" type="Sprite2D" parent="LettersContainer" unique_id=1178444814]
+texture = SubResource("AtlasTexture_q6i1s")
+
+[node name="Letter_E" type="Sprite2D" parent="LettersContainer" unique_id=1641164167]
+texture = SubResource("AtlasTexture_8ndyj")
+
+[node name="Letter_R" type="Sprite2D" parent="LettersContainer" unique_id=1551054103]
+texture = SubResource("AtlasTexture_kfyyy")

@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://cm0strl1a3b08" path="res://src/scenes/collectables/fruit/fruit.tscn" id="5_n73kd"]
 [ext_resource type="PackedScene" uid="uid://cjgqiaw8sipod" path="res://src/scenes/exit_flag/exit_flag.tscn" id="6_vd2p8"]
 [ext_resource type="PackedScene" uid="uid://c0c2h2w6xwre0" path="res://src/scenes/start_point/start_point.tscn" id="8_30otc"]
+[ext_resource type="PackedScene" uid="uid://jsvvx2k8ntk7" path="res://src/scenes/effects/winner_text/winner_text.tscn" id="9_wtext"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_27jab"]
 texture = ExtResource("2_n73kd")
@@ -193,3 +194,6 @@ position = Vector2(440, 176)
 
 [node name="StartPoint" parent="." unique_id=630250583 instance=ExtResource("8_30otc")]
 position = Vector2(80, 160)
+
+[node name="WinnerText" parent="." unique_id=741029485 instance=ExtResource("9_wtext")]
+position = Vector2(250, 75)
