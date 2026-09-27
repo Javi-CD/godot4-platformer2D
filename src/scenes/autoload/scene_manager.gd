@@ -2,13 +2,22 @@ extends CanvasLayer
 
 
 @onready var animation: AnimationPlayer = $TransitionAnimation
+@onready var transition_color: ColorRect = $TransitionColor
 
 var player: Player = null
 var last_scene_name: String = ""
 var scene_dir_path: String = "res://src/scenes/"
 
 
+func _ready() -> void:
+	if transition_color != null:
+		transition_color.visible = false
+
+
 func play_transition(on_middle_action: Callable = Callable()) -> void:
+	if transition_color != null:
+		transition_color.visible = true
+
 	if animation != null and animation.has_animation("transition_out"):
 		animation.play("transition_out")
 		await animation.animation_finished
@@ -19,6 +28,9 @@ func play_transition(on_middle_action: Callable = Callable()) -> void:
 	if animation != null and animation.has_animation("transition_in"):
 		animation.play("transition_in")
 		await animation.animation_finished
+
+	if transition_color != null:
+		transition_color.visible = false
 
 
 func change_scene(from: Node, to_scene_name: String) -> void:
