@@ -33,6 +33,7 @@ sources/0 = SubResource("TileSetAtlasSource_hr5xk")
 
 [node name="Level05" type="Node2D" unique_id=293861832]
 script = ExtResource("1_hr5xk")
+next_level_path = "uid://cav28lo0w17me"
 
 [node name="BackgroundParallax" type="Parallax2D" parent="." unique_id=569522028]
 repeat_size = Vector2(64, 64)

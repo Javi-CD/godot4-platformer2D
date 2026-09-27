@@ -464,7 +464,7 @@ script = ExtResource("1_qopur")
 
 [node name="PlayerAnimatedSprite" type="AnimatedSprite2D" parent="." unique_id=454103311]
 sprite_frames = SubResource("SpriteFrames_sm61a")
-animation = &"hurt"
+animation = &"idle"
 autoplay = "idle"
 
 [node name="PlayerColliision" type="CollisionShape2D" parent="." unique_id=542678203]
