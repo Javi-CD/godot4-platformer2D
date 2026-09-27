@@ -40,12 +40,13 @@ func load_level(level_path: String, animate: bool = true) -> void:
 
 	var scene_mgr = get_node_or_null("/root/SceneManager")
 	if animate and scene_mgr != null and scene_mgr.has_method("play_transition"):
-		await scene_mgr.play_transition(func(): _load_level_internal(level_path))
+		await scene_mgr.play_transition(func(): _load_level_internal(level_path, false))
+		_start_player_level_spawn()
 	else:
-		_load_level_internal(level_path)
+		_load_level_internal(level_path, true)
 
 
-func _load_level_internal(level_path: String) -> void:
+func _load_level_internal(level_path: String, trigger_spawn: bool = true) -> void:
 	var level_scene := load(level_path) as PackedScene
 	if level_scene == null:
 		push_warning("No se pudo cargar la escena: " + level_path)
@@ -74,7 +75,10 @@ func _load_level_internal(level_path: String) -> void:
 		_current_level.level_completed.connect(_on_level_completed)
 
 	_assign_level_player_to_hud()
-	_start_player_level_spawn()
+	if trigger_spawn:
+		_start_player_level_spawn()
+	else:
+		_prepare_player_for_spawn()
 
 
 func _update_current_level_index() -> void:
@@ -113,6 +117,20 @@ func _start_player_level_spawn() -> void:
 
 	if player != null and player.has_method("start_level_spawn"):
 		player.start_level_spawn()
+
+
+func _prepare_player_for_spawn() -> void:
+	if _current_level == null:
+		return
+
+	var player: Node = null
+	if _current_level.has_method("get_player"):
+		player = _current_level.get_player()
+	else:
+		player = _current_level.get_node_or_null("Player")
+
+	if player != null and "sprite" in player and player.sprite != null:
+		player.sprite.visible = false
 
 
 func _on_level_completed(next_level_path: String) -> void:
