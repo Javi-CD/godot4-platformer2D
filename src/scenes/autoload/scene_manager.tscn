@@ -7,6 +7,8 @@
 shader = ExtResource("2_55pvr")
 shader_parameter/pogress = 0.0
 shader_parameter/reverse = true
+shader_parameter/numberOfTiles = Vector2(15, 8.4375)
+shader_parameter/pixelsPrTiles = Vector2(16, 16)
 
 [sub_resource type="Animation" id="Animation_eih8t"]
 length = 0.001
@@ -37,7 +39,6 @@ tracks/1/keys = {
 
 [sub_resource type="Animation" id="Animation_04ro3"]
 resource_name = "transition_in"
-length = 0.5
 step = 1.0
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -46,7 +47,7 @@ tracks/0/path = NodePath("TransitionColor:material:shader_parameter/pogress")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.5),
+"times": PackedFloat32Array(0, 1),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [0.0, 1.0]
@@ -66,7 +67,6 @@ tracks/1/keys = {
 
 [sub_resource type="Animation" id="Animation_55pvr"]
 resource_name = "transition_out"
-length = 0.5
 step = 1.0
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -75,7 +75,7 @@ tracks/0/path = NodePath("TransitionColor:material:shader_parameter/pogress")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.5),
+"times": PackedFloat32Array(0, 1),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [0.0, 1.0]
