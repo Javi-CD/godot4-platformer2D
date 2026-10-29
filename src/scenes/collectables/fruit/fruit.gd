@@ -1,4 +1,5 @@
 @tool
+class_name Fruit
 extends Area2D
 
 
@@ -8,7 +9,10 @@ signal collected(fruit_type: StringName)
 enum FruitType {
 	APPLE,
 	BANANA,
-	KIWI
+	KIWI,
+	PINEAPPLE,
+	MELON,
+	CHERRY
 }
 
 
@@ -49,6 +53,12 @@ func _update_fruit_visual() -> void:
 			fruit_sprite.play("banana")
 		FruitType.KIWI:
 			fruit_sprite.play("kiwi")
+		FruitType.PINEAPPLE:
+			fruit_sprite.play("pineapple")
+		FruitType.MELON:
+			fruit_sprite.play("melon")
+		FruitType.CHERRY:
+			fruit_sprite.play("cherry")
 
 
 func _on_body_entered(body: Node) -> void:
@@ -70,6 +80,7 @@ func _collect() -> void:
 	collect_effect_sprite.play("collected")
 
 	emit_signal("collected", _get_fruit_name())
+	SoundManager.play_sfx("fruit_collect", 0.08)
 
 
 func reset_fruit() -> void:
@@ -96,5 +107,11 @@ func _get_fruit_name() -> StringName:
 			return &"banana"
 		FruitType.KIWI:
 			return &"kiwi"
+		FruitType.PINEAPPLE:
+			return &"pineapple"
+		FruitType.MELON:
+			return &"melon"
+		FruitType.CHERRY:
+			return &"cherry"
 
 	return &"unknown"

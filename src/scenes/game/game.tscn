@@ -1,11 +1,22 @@
 [gd_scene format=3 uid="uid://baj8tlkymatdn"]
 
 [ext_resource type="Script" uid="uid://bvir1s50seqq5" path="res://src/scenes/game/game.gd" id="1_yw0pm"]
+[ext_resource type="PackedScene" uid="uid://dky0mc6etwe3a" path="res://src/scenes/levels/level_01/level_01.tscn" id="2_3fbob"]
+[ext_resource type="Script" uid="uid://td7wttxuvp4k" path="res://src/scenes/camera/main_camera.gd" id="2_camera"]
+[ext_resource type="PackedScene" uid="uid://dk4v1ooh8fpy8" path="res://src/scenes/levels/level_03/level_03.tscn" id="2_i43ty"]
+[ext_resource type="PackedScene" uid="uid://c11rxuw2jfhv5" path="res://src/scenes/levels/level_02/level_02.tscn" id="3_14lda"]
+[ext_resource type="PackedScene" uid="uid://dy3t230dijxpu" path="res://src/scenes/levels/level_04/level_04.tscn" id="5_p0lgu"]
 [ext_resource type="PackedScene" uid="uid://d17dc028f211v" path="res://src/scenes/hud/hud.tscn" id="5_viayp"]
+[ext_resource type="PackedScene" uid="uid://brmxq3g8dgrr7" path="res://src/scenes/levels/level_05/level_05.tscn" id="6_jvdw2"]
 
 [node name="Game" type="Node2D" unique_id=628198194]
 script = ExtResource("1_yw0pm")
 first_level_path = "uid://dky0mc6etwe3a"
+level_sequence = Array[PackedScene]([ExtResource("2_3fbob"), ExtResource("3_14lda"), ExtResource("2_i43ty"), ExtResource("5_p0lgu"), ExtResource("6_jvdw2")])
+
+[node name="MainCamera" type="Camera2D" parent="." unique_id=2083941029]
+position = Vector2(250, 150)
+script = ExtResource("2_camera")
 
 [node name="LevelContainer" type="Node" parent="." unique_id=1612619149]
 

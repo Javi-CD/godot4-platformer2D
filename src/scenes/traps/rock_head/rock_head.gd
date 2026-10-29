@@ -1,3 +1,4 @@
+class_name RockHead
 extends CharacterBody2D
 
 
@@ -22,13 +23,19 @@ enum MovementMode {
 @export_range(0.5, 10.0, 0.1) var blink_interval_min := 2.0
 @export_range(0.5, 10.0, 0.1) var blink_interval_max := 4.5
 
+@export_group("Screen Shake")
+@export var enable_screen_shake := true
+@export_range(0.5, 10.0, 0.5) var shake_intensity := 3.5
+@export_range(0.05, 0.5, 0.05) var shake_duration := 0.15
+
 
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var player_detector: Area2D = $PlayerDetector
 @onready var path: Node2D = $Path
 
 
-var _points: Array[Vector2] = []
+var _initial_position := Vector2.ZERO
+var _local_points: Array[Vector2] = []
 var _current_index := 0
 var _direction := 1
 
@@ -41,13 +48,32 @@ var _is_playing_hit_animation := false
 
 
 func _ready() -> void:
+	_initial_position = global_position
 	_collect_points()
 
-	if _points.size() > 0:
-		global_position = _points[0]
+	if _local_points.size() > 0:
+		global_position = _initial_position + _local_points[0]
 		_current_index = _get_next_point_index()
+		_start_point_delay_if_needed()
 
 	sprite.animation_finished.connect(_on_sprite_animation_finished)
+	_reset_blink_timer()
+	_play_idle()
+
+
+func reset_platform() -> void:
+	_current_index = 0
+	_direction = 1
+	_delay_timer = 0.0
+	_current_speed = 0.0
+	_travel_direction = Vector2.ZERO
+	_is_playing_hit_animation = false
+
+	if _local_points.size() > 0:
+		global_position = _initial_position + _local_points[0]
+		_current_index = _get_next_point_index()
+		_start_point_delay_if_needed()
+
 	_reset_blink_timer()
 	_play_idle()
 
@@ -55,7 +81,7 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	_update_blink_timer(delta)
 
-	if _points.size() < 2:
+	if _local_points.size() < 2:
 		return
 
 	if _is_playing_hit_animation:
@@ -65,7 +91,7 @@ func _physics_process(delta: float) -> void:
 		_delay_timer = max(_delay_timer - delta, 0.0)
 		return
 
-	var target := _points[_current_index]
+	var target := _initial_position + _local_points[_current_index]
 	var to_target := target - global_position
 	var distance_to_target := to_target.length()
 
@@ -79,7 +105,7 @@ func _physics_process(delta: float) -> void:
 
 	var desired_speed := max_speed
 
-	# Desaceleración cerca del objetivo para que el movimiento se vea menos rígido.
+	# Slow down near the target for a less rigid movement.
 	if slow_down_distance > 0.0 and distance_to_target < slow_down_distance:
 		var ratio := distance_to_target / slow_down_distance
 		desired_speed *= clamp(ratio, 0.25, 1.0)
@@ -96,7 +122,7 @@ func _physics_process(delta: float) -> void:
 	var collision := move_and_collide(allowed_motion)
 
 	if collision != null:
-		# Aquí solo deberíamos estar chocando con el mundo, no con el jugador.
+		# Here we should only be colliding with the world, not the player.
 		_current_speed = 0.0
 		_play_hit_animation_from_direction(_travel_direction)
 		_advance_point()
@@ -109,7 +135,7 @@ func _physics_process(delta: float) -> void:
 
 
 func _collect_points() -> void:
-	_points.clear()
+	_local_points.clear()
 
 	var markers := []
 
@@ -120,7 +146,8 @@ func _collect_points() -> void:
 	markers.sort_custom(func(a, b): return a.name < b.name)
 
 	for marker in markers:
-		_points.append(marker.global_position)
+		var local_pos: Vector2 = path.transform * marker.position
+		_local_points.append(local_pos)
 
 
 func _arrive_at_point() -> void:
@@ -135,19 +162,19 @@ func _advance_point() -> void:
 		MovementMode.PING_PONG:
 			_current_index += _direction
 
-			if _current_index >= _points.size() or _current_index < 0:
+			if _current_index >= _local_points.size() or _current_index < 0:
 				_direction *= -1
 				_current_index += _direction * 2
 
 		MovementMode.LOOP:
 			_current_index += 1
 
-			if _current_index >= _points.size():
+			if _current_index >= _local_points.size():
 				_current_index = 0
 
 
 func _get_next_point_index() -> int:
-	if _points.size() < 2:
+	if _local_points.size() < 2:
 		return 0
 
 	return 1
@@ -177,6 +204,11 @@ func _play_hit_animation_from_direction(direction: Vector2) -> void:
 
 	_is_playing_hit_animation = true
 	sprite.play(animation_name)
+
+	if enable_screen_shake:
+		MainCamera.shake(shake_intensity, shake_duration)
+
+	SoundManager.play_sfx("bump", 0.05)
 
 
 func _update_blink_timer(delta: float) -> void:
@@ -241,18 +273,13 @@ func _resolve_player_push(desired_motion: Vector2) -> Vector2:
 			continue
 
 		if body.has_method("is_invulnerable") and body.is_invulnerable():
-			# Aunque esté invulnerable, si no puede moverse no queremos atravesarlo.
 			pass
 
-		# Si el jugador ya no puede seguir moviéndose en la dirección del empuje,
-		# se considera aplastamiento y la roca no avanza más este frame.
 		if body.has_method("can_be_pushed") and not body.can_be_pushed(desired_motion):
 			if body.has_method("take_damage"):
 				body.take_damage(global_position, damage)
 			return Vector2.ZERO
-
-		# Si puede moverse, primero movemos al jugador
-		# y luego dejamos avanzar a la roca.
+		
 		if body.has_method("apply_push"):
 			body.apply_push(desired_motion)
 		else:

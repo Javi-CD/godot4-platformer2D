@@ -1,0 +1,100 @@
+[gd_scene format=3 uid="uid://cjewfc1sea1ke"]
+
+[ext_resource type="Texture2D" uid="uid://danm688ulkhw2" path="res://assets/Traps/Falling Platforms/Off.png" id="1_2n655"]
+[ext_resource type="Script" uid="uid://dxjqykkxd3pgw" path="res://src/scenes/traps/falling_platform/falling_platform.gd" id="1_upt01"]
+[ext_resource type="Texture2D" uid="uid://dw2vgtvf7u8eu" path="res://assets/Traps/Falling Platforms/On (32x10).png" id="2_upt01"]
+[ext_resource type="Texture2D" uid="uid://d08gcv24f5jej" path="res://assets/Other/Dust Particle.png" id="4_ttthg"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ttthg"]
+atlas = ExtResource("1_2n655")
+region = Rect2(0, 0, 32, 10)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_drl7l"]
+atlas = ExtResource("2_upt01")
+region = Rect2(32, 0, 32, 10)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_amxci"]
+atlas = ExtResource("2_upt01")
+region = Rect2(0, 0, 32, 10)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_r8gcg"]
+atlas = ExtResource("2_upt01")
+region = Rect2(64, 0, 32, 10)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nu2yg"]
+atlas = ExtResource("2_upt01")
+region = Rect2(96, 0, 32, 10)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ybfic"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ttthg")
+}],
+"loop": false,
+"name": &"off",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_drl7l")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_amxci")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_r8gcg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nu2yg")
+}],
+"loop": true,
+"name": &"on",
+"speed": 15.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ao5gl"]
+size = Vector2(32, 4)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_042jo"]
+size = Vector2(31, 1)
+
+[sub_resource type="Curve" id="Curve_ttthg"]
+_data = [Vector2(0.05362776, 1), 0.0, 0.0, 0, 0, Vector2(0.36277598, 0.70379746), 0.0, 0.0, 0, 0, Vector2(0.93375397, 0.29240507), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[node name="FallingPlatform" type="AnimatableBody2D" unique_id=808692909]
+collision_mask = 0
+script = ExtResource("1_upt01")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1884297535]
+sprite_frames = SubResource("SpriteFrames_ybfic")
+animation = &"on"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=833362788]
+position = Vector2(0, -2)
+shape = SubResource("RectangleShape2D_ao5gl")
+
+[node name="PlayerDetectorArea" type="Area2D" parent="." unique_id=284453969]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerDetectorArea" unique_id=181540438]
+position = Vector2(0, -5)
+shape = SubResource("RectangleShape2D_042jo")
+debug_color = Color(0.5131593, 0.57730854, 0, 0.41960785)
+
+[node name="AirParticles" type="CPUParticles2D" parent="." unique_id=907794509]
+position = Vector2(0, 6)
+amount = 4
+texture = ExtResource("4_ttthg")
+preprocess = 0.5
+emission_shape = 3
+emission_rect_extents = Vector2(12, 1)
+direction = Vector2(0, 1)
+spread = 0.0
+gravity = Vector2(0, 30)
+initial_velocity_min = 15.0
+initial_velocity_max = 35.0
+scale_amount_curve = SubResource("Curve_ttthg")
+color = Color(1, 1, 1, 0.27450982)
